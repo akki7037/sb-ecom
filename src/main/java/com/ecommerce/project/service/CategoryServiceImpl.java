@@ -29,7 +29,6 @@ public class CategoryServiceImpl implements CategoryService{
     @Override
     public CategoryResponseDTO getCategories(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder){
 
-        System.out.println("Debug - sortBy: " + sortBy + ", sortOrder: " + sortOrder);
         Sort sortByAndOrder = sortOrder.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() :
                 Sort.by(sortBy).ascending();
 
