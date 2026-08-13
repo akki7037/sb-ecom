@@ -2,10 +2,13 @@ package com.ecommerce.project.service;
 
 import com.ecommerce.project.exception.APIException;
 import com.ecommerce.project.exception.ResourceNotFoundException;
+import com.ecommerce.project.model.Cart;
 import com.ecommerce.project.model.Category;
 import com.ecommerce.project.model.Product;
+import com.ecommerce.project.payload.CartDTO;
 import com.ecommerce.project.payload.ProductDTO;
 import com.ecommerce.project.payload.ProductResponseDTO;
+import com.ecommerce.project.repository.CartRepository;
 import com.ecommerce.project.repository.CategoryRepository;
 import com.ecommerce.project.repository.ProductRepository;
 import org.modelmapper.ModelMapper;
@@ -27,6 +30,12 @@ import java.util.UUID;
 
 @Service
 public class ProductServiceImpl implements ProductService{
+
+    @Autowired
+    CartRepository cartRepository;
+
+    @Autowired
+    CartService cartService;
 
     @Autowired
     private ProductRepository productRepository;
@@ -155,6 +164,19 @@ public class ProductServiceImpl implements ProductService{
 
         Product savedProduct = productRepository.save(productToBeUpdated);
 
+        List<Cart> carts = cartRepository.findByProductId(productId);
+
+        List<CartDTO> cartDTOS = carts.stream().map(cart ->{
+            CartDTO cartDTO = modelMapper.map(cart, CartDTO.class);
+            List<ProductDTO> productDTOS = cart.getCartItems().stream()
+                    .map(p-> modelMapper.map(p.getProduct(), ProductDTO.class))
+                    .toList();
+            cartDTO.setProducts(productDTOS);
+            return  cartDTO;
+        }).toList();
+
+        cartDTOS.forEach(cart -> cartService.updateProductsInCart(cart.getCartId(), productId));
+
         return modelMapper.map(savedProduct, ProductDTO.class);
     }
 
@@ -165,6 +187,10 @@ public class ProductServiceImpl implements ProductService{
                 );
 
         ProductDTO productDTO = modelMapper.map(removedProduct, ProductDTO.class);
+
+        List<Cart> carts = cartRepository.findByProductId(productId);
+        carts.forEach((cart -> cartService.deleteProductFromCart(cart.getId(), productId)));
+
         productRepository.delete(removedProduct);
         return productDTO;
     }
