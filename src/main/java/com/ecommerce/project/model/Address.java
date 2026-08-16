@@ -27,6 +27,10 @@ public class Address {
     private String street;
 
     @NotBlank
+    @Size(min = 6, message = "please provide at least 6 characters")
+    private String buildingName;
+
+    @NotBlank
     @Size(min = 2, message = "please provide at least 2 characters")
     private String city;
     @NotBlank
@@ -39,12 +43,13 @@ public class Address {
     @Size(min = 6, message = "please provide at least 6 characters")
     private String pincode;
 
-    @ToString.Exclude
-    @ManyToMany(mappedBy = "addresses")
-    private List<User> users = new ArrayList<>();
+    @ManyToOne()
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    public Address(String street, String city, String state, String country, String pincode) {
+    public Address(String street, String city, String state, String country, String pincode, String buildingName) {
         this.street = street;
+        this.buildingName = buildingName;
         this.city = city;
         this.state = state;
         this.country = country;
