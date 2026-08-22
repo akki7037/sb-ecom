@@ -1,5 +1,6 @@
 package com.ecommerce.project.payload;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -14,11 +15,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CategoryDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "Category ID", example = "101")
     private Long categoryId;
 
-    @Size(min = 2, max =50, message = "size must be between 2 and 50")
-    @NotBlank(message = "category cannot be blank")
+    @Schema(description = "Category name of the category that you wish to create", example = "food")
     private String categoryName;
 }
